@@ -1,4 +1,4 @@
-name: Build Myra OS
+name: Build Myra OS ISO
 
 on: [push, pull_request]
 
@@ -10,17 +10,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Install NASM
-      run: sudo apt-get update && sudo apt-get install -y nasm
+    - name: Install NASM and Genisoimage
+      run: sudo apt-get update && sudo apt-get install -y nasm genisoimage
 
-    - name: Build OS Binaries & Image
+    - name: Build Binaries, Image, and Bootable ISO
       run: |
         nasm -f bin boot.asm -o boot.bin
         nasm -f bin kernel.asm -o kernel.bin
         cat boot.bin kernel.bin > os.img
+        # Create a bootable ISO using 1.44MB floppy emulation
+        genisoimage -b os.img -o myra-os.iso os.img
 
-    - name: Upload OS Image Artifact
+    - name: Upload ISO Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: myra-os-floppy-image
-        path: os.img
+        name: myra-os-iso
+        path: myra-os.iso
