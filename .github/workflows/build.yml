@@ -18,7 +18,8 @@ jobs:
         nasm -f bin boot.asm -o boot.bin
         nasm -f bin kernel.asm -o kernel.bin
         cat boot.bin kernel.bin > os.img
-        # Create a bootable ISO using 1.44MB floppy emulation
+        # Pad os.img to exactly 1.44MB (1474560 bytes) required for floppy emulation
+        truncate -s 1474560 os.img
         genisoimage -b os.img -o myra-os.iso os.img
 
     - name: Upload ISO Artifact
