@@ -1,0 +1,26 @@
+name: Build Myra OS
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install NASM
+      run: sudo apt-get update && sudo apt-get install -y nasm
+
+    - name: Build OS Binaries & Image
+      run: |
+        nasm -f bin boot.asm -o boot.bin
+        nasm -f bin kernel.asm -o kernel.bin
+        cat boot.bin kernel.bin > os.img
+
+    - name: Upload OS Image Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: myra-os-floppy-image
+        path: os.img
